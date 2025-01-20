@@ -102,8 +102,9 @@ open class Help() : Command {
 }
 
 open class Show() : Command {
-
+//Не передаются данные из классов
     override fun command() {
+
         val name = Persons("")
         val phone = Phone(0)
         val email = Email("")
