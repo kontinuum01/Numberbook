@@ -1,64 +1,159 @@
-fun numberBook() {
-    do {
+
+sealed interface Command {
+    fun command()
+}
+
+fun readCommand(choice: String): Command {
+    return when (choice.lowercase()) {
+        "addperson" -> {
+            println("Введите имя: ")
+            val name = readlnOrNull()
+            Persons(name)
+
+        }
+
+        "addemail" -> {
+            println("Введите имел: ")
+            val email = readlnOrNull()
+            Email(email)
+
+        }
+
+        "addphone" -> {
+            println("Введите номер телефона: ")
+            val phone = readlnOrNull()?.toIntOrNull()
+            Phone(phone)
+
+        }
+
+        "show" -> {
+            Show()
+        }
+
+        else -> Help()
+    }
+}
+
+open class Persons(val name: String?) : Command {
+
+    override fun command() {
+        println("${isValid()}")
+        if (!isValid()) {
+            println("Поле не может быть пустым")
+            Help().command()
+        } else {
+            println("Имя - $name")
+        }
+        main()
+    }
+
+    private fun isValid(): Boolean {
+        return name?.isNotBlank() ?: false
+    }
+}
+
+open class Email( val email: String?) : Command {
+
+    override fun command() {
+        println("${isValid()}")
+        if (!isValid()) {
+            println("Поле не может быть пустым")
+            Help().command()
+        } else {
+            println("Имел - $email")
+        }
+        main()
+
+    }
+
+    private fun isValid(): Boolean {
+        return email?.isNotBlank() ?: false
+    }
+}
+
+
+open class Phone(val phone: Int?) : Command {
+    override fun command() {
+        println("${isValid()}")
+        if (!isValid()) {
+            println("Неккоректный ввод")
+            Help().command()
+        } else {
+            println("Телефон = '$phone'")
+        }
+        main()
+    }
+
+    private fun isValid(): Boolean {
+        return phone != null
+    }
+}
+
+open class Help() : Command {
+    override fun command() {
         println(
-            "Выберите команду: " +
-                    "addPerson/ " + "addEmail/ " + "addPhone/ " + "Help/ " + "Exit"
+            "Записная книжка.Для того чтобы добавить данные вводите следующие команды: " +
+                    "<addperson>, <addemail>, <addphone>/ Работа с программой, выберите <help>/" +
+                    " Чтобы отобразить добавленные данные выберите <show>/ " +
+                    "Чтобы выйти из программы выберите <exit>"
         )
-        val scn = readlnOrNull()
-
-        if (scn == "addPerson") {
-            addPerson()
-        }
-        if (scn == "addEmail") {
-            addEmail()
-        }
-        if (scn == "addPhone") {
-            addPhone()
-        }
-        if (scn == "Help") {
-            help()
-        }
-    } while (scn != "Exit")
+        main()
+    }
 }
 
-fun addPerson() {
-    println("Введите имя:")
-    val person = readlnOrNull()
-    if (person != null) {
-        println("name-$person")
-    } else {
-        println("Поле не может быть пустым!")
-        addPerson()
+open class Show() : Command {
+
+    override fun command() {
+        val name = Persons("")
+        val phone = Phone(0)
+        val email = Email("")
+
+        if (name == null && phone == null && email == null) {
+            println("Not Initialized")
+            main()
+        } else {
+            val persons = Person(name = name.toString(), phone = phone.hashCode(), email = email.toString())
+            println(persons)
+            main()
+        }
+    }
+}
+
+open class Exit {
+    fun exit() {
+        println("Выход из программы")
+        return
+    }
+}
+
+data class Person(
+    val name: String,
+    val phone: Int,
+    val email: String
+)  {
+    override fun equals(other: Any?): Boolean {
+        if (this === other) return true
+        if (javaClass != other?.javaClass) return false
+
+        other as Person
+
+        if (phone != other.phone) return false
+        if (name != other.name) return false
+        if (email != other.email) return false
+
+        return true
+    }
+
+    override fun hashCode(): Int {
+        var result = phone
+        result = 31 * result + name.hashCode()
+        result = 31 * result + email.hashCode()
+        return result
+    }
+
+    override fun toString(): String {
+        return "Person(name='$name', phone=$phone, email='$email')"
     }
 }
 
 
-fun addEmail() {
-    println("Введите емеил:")
-    val email = readlnOrNull()
-    if (email != null) {
-        println("email-$email")
-    } else {
-        println("Поле не может быть пустым!")
-        addEmail()
-
-    }
-}
-
-fun addPhone() {
-    println("Введите номер:")
-    val phone = readlnOrNull()?.toIntOrNull()
-    if (phone != null) {
-        println("phone-$phone")
-    } else {
-        println("Некорректный ввод!")
-        addPhone()
-    }
-}
-
-fun help() {
-    println(
-        "Записная книжка.Для того чтобы добавить данные вводите следующие команды: " +
-                "addPerson/ addEmail/ addPhone/ Help/ Exit"
-    )
-}
