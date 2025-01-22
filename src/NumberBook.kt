@@ -3,18 +3,22 @@ sealed interface Command {
     fun command()
 }
 
+val person = Person("", phone = 0,"")
+
 fun readCommand(choice: String): Command {
     return when (choice.lowercase()) {
         "addperson" -> {
             println("Введите имя: ")
-            val name = readlnOrNull()
+            val name = readln()
+            person.name = name
             Persons(name)
 
         }
 
         "addemail" -> {
-            println("Введите имел: ")
-            val email = readlnOrNull()
+            println("Введите имейл: ")
+            val email = readln()
+            person.email = email
             Email(email)
 
         }
@@ -22,25 +26,29 @@ fun readCommand(choice: String): Command {
         "addphone" -> {
             println("Введите номер телефона: ")
             val phone = readlnOrNull()?.toIntOrNull()
+            if (phone != null) {
+                person.phone = phone
+            }
             Phone(phone)
 
         }
 
         "show" -> {
-            Show()
+            Show(person)
         }
 
         else -> Help()
     }
 }
 
-open class Persons(val name: String?) : Command {
+open class Persons(private val name: String?) : Command {
 
     override fun command() {
         println("${isValid()}")
         if (!isValid()) {
             println("Поле не может быть пустым")
             Help().command()
+            return
         } else {
             println("Имя - $name")
         }
@@ -52,15 +60,16 @@ open class Persons(val name: String?) : Command {
     }
 }
 
-open class Email( val email: String?) : Command {
+open class Email(private val email: String?) : Command {
 
     override fun command() {
         println("${isValid()}")
         if (!isValid()) {
             println("Поле не может быть пустым")
             Help().command()
+            return
         } else {
-            println("Имел - $email")
+            println("Имейл - $email")
         }
         main()
 
@@ -72,12 +81,13 @@ open class Email( val email: String?) : Command {
 }
 
 
-open class Phone(val phone: Int?) : Command {
+open class Phone(private val phone: Int?) : Command {
     override fun command() {
         println("${isValid()}")
         if (!isValid()) {
             println("Неккоректный ввод")
             Help().command()
+            return
         } else {
             println("Телефон = '$phone'")
         }
@@ -101,20 +111,15 @@ open class Help() : Command {
     }
 }
 
-open class Show() : Command {
-//Не передаются данные из классов
+open class Show(person: Person) : Command {
+
     override fun command() {
 
-        val name = Persons("")
-        val phone = Phone(0)
-        val email = Email("")
-
-        if (name == null && phone == null && email == null) {
+        if (person.name == "" && person.phone == 0 && person.email == "") {
             println("Not Initialized")
             main()
         } else {
-            val persons = Person(name = name.toString(), phone = phone.hashCode(), email = email.toString())
-            println(persons)
+            println(person)
             main()
         }
     }
@@ -128,9 +133,9 @@ open class Exit {
 }
 
 data class Person(
-    val name: String,
-    val phone: Int,
-    val email: String
+    var name: String,
+    var phone: Int,
+    var email: String
 )  {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
