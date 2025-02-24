@@ -1,7 +1,7 @@
 fun main() {
-    println("Выберите команду (addperson/ addemail/ addphone/ help/ show/ exit):")
+    println("Выберите команду (addperson/ addemail/ addphone/ addpersons/ help/ show/ find/ exit):")
 
-    val choice = readlnOrNull() ?: ""
+    val choice = readln()
 
     val commands = readCommand(choice)
 
