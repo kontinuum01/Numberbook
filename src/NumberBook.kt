@@ -38,9 +38,9 @@ fun readCommand(choice: String): Command {
         }
 
         "find" -> {
-            println("Введите телефон: ")
-            val phone = readln().toInt()
-            Find(phone)
+            println("Введите телефон или имейл: ")
+            val element = readln()
+            Find(element)
         }
 
         else -> Help()
@@ -76,17 +76,16 @@ open class Email(private val name: String) : Command {
             Help().command()
             return
         } else {
-            val index = personList.indexOf(Person(name))
-            if (index in personList.indices) {
+            val person = personList.find { it.name == name }
+            if (person != null) {
                 println("Введите имейл: ")
-            } else {
-                println("Индекс вне диапазона")
-            }
-            val email = readlnOrNull()
-            if (email != null) {
-                personList[index].email.add(name)
+                val email = readln()
+                person.email.add(email)
                 println("Успешно добавлено")
-            } else Help().command()
+            } else {
+                println("Персона не найдена!")
+                Help().command()
+            }
         }
         main()
         return
@@ -106,19 +105,16 @@ open class Phone(private val name: String) : Command {
             Help().command()
             return
         } else {
-            val index = personList.indexOf(Person(name))
-            if (index in personList.indices) {
+            val person = personList.find { it.name == name }
+            if (person != null) {
                 println("Введите номер телефона: ")
+                val phone = readln()
+                person.phone.add(phone)
+                println("Успешно добавлено")
             } else {
-                println("Индекс вне диапазона")
+                println("Персона не найдена!")
                 main()
             }
-            val phone = readlnOrNull()?.toIntOrNull()
-            if (phone != null) {
-                personList[index].phone.add(phone)
-                println("Успешно добавлено")
-            } else Help().command()
-
         }
         main()
         return
@@ -145,13 +141,12 @@ open class Help() : Command {
 open class Show(private val name: String) : Command {
 
     override fun command() {
-        val persons = personList.indexOf(Person(name))
-        if (persons in personList.indices) {
-            val element = personList[persons]
+        val person = personList.find { it.name == name }
+        if (person != null) {
 //            println(personList)
-            println(element)
+            println(person)
         } else {
-            println("Индекс вне диапазона!")
+            println("Персона не найдена!")
         }
         main()
         return
@@ -159,16 +154,15 @@ open class Show(private val name: String) : Command {
     }
 }
 
-open class Find(private val phone: Int) : Command {
+open class Find(private val element: String) : Command {
     override fun command() {
-        val persons = personList.filter { it.phone = mutableListOf(phone) }
-        println(persons)
+        val persons =
+            personList.filter { person -> person.phone[0].contains(element) || person.email[0].contains(element) }
+        if (!persons.isEmpty()) {
+            println(persons)
+        } else println("Not find")
         main()
-    }
-
-    private fun <E> List<E>.filter(predicate: (E) -> Unit): List<Person> {
-
-        return listOf()
+        return
     }
 
 }
@@ -183,9 +177,12 @@ open class Exit {
 
 data class Person(
     var name: String,
-    var phone: MutableList<Int> = mutableListOf(),
+    var phone: MutableList<String> = mutableListOf(),
     var email: MutableList<String> = mutableListOf()
 ) {
+    init {
+        println("create new Person ${this.hashCode()}")
+    }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -205,9 +202,10 @@ data class Person(
     }
 
     override fun hashCode(): Int {
-        return javaClass.hashCode()
+        return super.hashCode()
     }
 }
+
 
 
 
