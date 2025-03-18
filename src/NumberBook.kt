@@ -1,7 +1,12 @@
-import java.lang.IndexOutOfBoundsException
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.decodeFromString
+import java.io.FileOutputStream
 
 sealed interface Command {
     fun command()
+
 }
 
 val personList = mutableListOf<Person>()
@@ -41,6 +46,12 @@ fun readCommand(choice: String): Command {
             println("Введите телефон или имейл: ")
             val element = readln()
             Find(element)
+        }
+
+        "export" -> {
+            println("Задайте имя файла: ")
+            val filename = readln()
+            Export(filename)
         }
 
         else -> Help()
@@ -167,6 +178,17 @@ open class Find(private val element: String) : Command {
 
 }
 
+open class Export(private val filename: String) : Command {
+    override fun command() {
+//        val users = personList
+//        val jsonString = Json.encodeToString(users)
+//        println(jsonString)
+
+    }
+}
+
+//    File(""/Users/user/file.txt"").writeText(""Text to write"")
+//    FileOutputStream(file).use { it.write(text.toByteArray(Charsets.UTF_8)) }
 
 open class Exit {
     fun exit() {
@@ -175,6 +197,7 @@ open class Exit {
     }
 }
 
+@Serializable
 data class Person(
     var name: String,
     var phone: MutableList<String> = mutableListOf(),
