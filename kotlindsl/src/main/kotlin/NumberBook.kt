@@ -1,12 +1,9 @@
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.encodeToString
-import kotlinx.serialization.decodeFromString
-import java.io.FileOutputStream
+import java.io.File
 
 sealed interface Command {
     fun command()
-
 }
 
 val personList = mutableListOf<Person>()
@@ -142,6 +139,7 @@ open class Help() : Command {
             "Записная книжка.Для того чтобы добавить данные вводите следующие команды: " +
                     "<addperson>, <addemail>, <addphone>, <addpersons>/ Работа с программой, выберите <help>/" +
                     " Чтобы отобразить добавленные данные выберите <show>/ <find> " +
+                    "Чтобы экспортировать данные в файл выберите команду <export>"+
                     "Чтобы выйти из программы выберите <exit>"
         )
         main()
@@ -180,15 +178,15 @@ open class Find(private val element: String) : Command {
 
 open class Export(private val filename: String) : Command {
     override fun command() {
-//        val users = personList
-//        val jsonString = Json.encodeToString(users)
-//        println(jsonString)
-
+        val persons = personList
+        val jsonString = Json.encodeToString(persons)
+        println(jsonString)
+        File("$filename.txt").writeText(jsonString)
+        println("Файл $filename создан!")
+        main()
+        return
     }
 }
-
-//    File(""/Users/user/file.txt"").writeText(""Text to write"")
-//    FileOutputStream(file).use { it.write(text.toByteArray(Charsets.UTF_8)) }
 
 open class Exit {
     fun exit() {
